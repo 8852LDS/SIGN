@@ -12,7 +12,7 @@
 
     <LinearLayout
         android:fitsSystemWindows="true"
-        android:background="#8000"
+        android:background="#3f000000"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -28,41 +28,41 @@
         <EditText
             android:id="@+id/register_sno"
             android:maxLines="1"
-            android:layout_width="280dp"
+            android:layout_width="260dp"
             android:layout_height="wrap_content"
             android:hint="账号"
             android:digits="1234567890"
             android:textColorHint="#fff"
             android:textColor="#fff"
-            android:textSize="30sp"
-            android:layout_marginLeft="50dp"
+            android:textSize="25sp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"/>
         <EditText
             android:id="@+id/register_passward"
             android:maxLines="1"
             android:inputType="textPassword"
-            android:layout_width="280dp"
+            android:layout_width="260dp"
             android:layout_height="wrap_content"
             android:hint="密码"
             android:textColorHint="#fff"
             android:textColor="#fff"
-            android:textSize="30sp"
-            android:layout_marginLeft="50dp"
+            android:textSize="25sp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"/>
             <Button
                 android:id="@+id/register_ok"
-                android:layout_width="280dp"
+                android:layout_width="260dp"
                 android:layout_height="wrap_content"
                 android:text="登     陆"
                 android:textSize="30sp"
                 android:textColor="#fff"
-                android:background="#00BFFF"
-                android:layout_marginLeft="50dp"
+                android:background="#cf00BFFF"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"/>
         <RelativeLayout
-            android:layout_width="280dp"
+            android:layout_width="260dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="50dp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp">
             <CheckBox
                 android:id="@+id/register_mind"
@@ -81,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:text="登陆即代表阅读服务条款"
+                android:text="登陆即代表阅读并同意服务条款"
                 android:gravity="center"
                 android:textColor="#fff"
                 android:textSize="15sp"

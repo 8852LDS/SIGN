@@ -1,8 +1,10 @@
 package com.example.sign;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private String passward ;
     private boolean mind ;
     private boolean auto ;
+    //进度条
+    private ProgressDialog progressDialog ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,14 +94,6 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this,"请输入密码！",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (mind){
-                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit() ;
-                    editor.putString("registerSno",sno) ;
-                    editor.putString("registerPwd",passward) ;
-                    editor.putBoolean("registerMind",mind) ;
-                    editor.putBoolean("registerAuto",auto) ;
-                    editor.apply();
-                }
                 register();
             }
         });
@@ -115,21 +111,57 @@ public class MainActivity extends AppCompatActivity {
             //具体的Callback
             @Override
             public void onFailure(Call call, IOException e) {
-                registerPwd.setText("");
-                Toast.makeText(MyApplication.getContext(),"账号或密码错误，请重新登陆！",Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        registerPwd.setText("");
+                        Toast.makeText(MainActivity.this,"连接服务器出错，请重新登陆！",Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }
+                });
             }
-
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String result = response.body().toString() ;
+                final String result = response.body().string() ;
                 if("false".equals(result)){
-                    registerPwd.setText("");
-                    Toast.makeText(MyApplication.getContext(),"账号或密码错误，请重新登陆！",Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            registerPwd.setText("");
+                            Toast.makeText(MyApplication.getContext(),"账号或密码错误，请重新登陆！",Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
+                        }
+                    });
                 }else if ("true".equals(result)){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressDialog.dismiss();
+                        }
+                    });
+                    if (mind){
+                        SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit() ;
+                        editor.putString("registerSno",sno) ;
+                        editor.putString("registerPwd",passward) ;
+                        editor.putBoolean("registerMind",mind) ;
+                        editor.putBoolean("registerAuto",auto) ;
+                        editor.apply();
+                    }else {
+                        SharedPreferences.Editor editor = getSharedPreferences("data",MODE_PRIVATE).edit() ;
+                        editor.putString("registerSno",sno) ;
+                        editor.apply();
+                    }
                     skipActivity();
                 }else {
-                    registerPwd.setText("");
-                    Toast.makeText(MyApplication.getContext(),"出现未知错误，请重新登陆！",Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            registerPwd.setText("");
+                            Toast.makeText(MyApplication.getContext(),"出现未知错误，请重新登陆！",Toast.LENGTH_SHORT).show();
+                            Log.d("Main",result) ;
+                            progressDialog.dismiss();
+                        }
+                    });
                 }
             }
         });
@@ -138,12 +170,16 @@ public class MainActivity extends AppCompatActivity {
      * 上传账号密码进行匹配
      */
     public void checkRegister(okhttp3.Callback callback){
-       /* OkHttpClient client = new OkHttpClient() ;
-        RequestBody requestBody = new FormBody.Builder().add("sno",sno).add("passwoard",passward).build() ;
-        Request request = new Request.Builder().url(Util.serviceUrl + "servletCheckRegister").post(requestBody).build() ;
-        client.newCall(request).enqueue(callback);*/
-        //由于没建立服务器，现在只能模拟
-        Toast.makeText(this,"登陆检测",Toast.LENGTH_SHORT).show();
+        //显示登陆进度提示
+        progressDialog = new ProgressDialog(MainActivity.this) ;
+        progressDialog.setMessage("正在登陆");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        OkHttpClient client = new OkHttpClient() ;
+        RequestBody requestBody = new FormBody.Builder().add("sno",sno).add("passward",passward).build() ;
+        Request request = new Request.Builder().url(Util.serviceUrl + "android/checkRegister").post(requestBody).build();
+        client.newCall(request).enqueue(callback);
     }
     /**
      * 密码和账号匹配成功，跳转活动
@@ -157,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
      * 搜索本地的账号密码以及登陆设置
      */
     public void contains(){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this) ;
+        SharedPreferences prefs = getSharedPreferences("data",MODE_PRIVATE) ;
         String snos = prefs.getString("registerSno",null) ;
         String pwds = prefs.getString("registerPwd",null) ;
         boolean minds = prefs.getBoolean("registerMind",false) ;
@@ -165,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         if (minds){
             registerSno.setText(snos);
             registerPwd.setText(pwds);
-            registerMind.isChecked() ;
+            registerMind.setChecked(true);
         }
         if (autos){
             register();
