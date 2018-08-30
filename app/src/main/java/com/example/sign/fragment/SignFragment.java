@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.example.sign.MainActivity;
 import com.example.sign.ManagerActivity;
+import com.example.sign.PermissionAcitivity;
 import com.example.sign.R;
 import com.example.sign.Util.MyApplication;
 import com.example.sign.fragment.LeaveFragment;
@@ -40,6 +41,8 @@ import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by Administrator on 2018/8/27 0027.
@@ -86,6 +89,15 @@ public class SignFragment extends Fragment {
                 scanStart.setVisibility(View.VISIBLE);
             }
         });
+        scanOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scanLayout.setVisibility(View.GONE);
+                scanStart.setVisibility(View.VISIBLE);
+                Intent intent = new Intent(getContext(), PermissionAcitivity.class) ;
+                startActivity(intent);
+            }
+        });
         return view;
     }
     @Override
@@ -117,7 +129,7 @@ public class SignFragment extends Fragment {
                                         return;
                                     }
                                     //解析处理后的字符串
-                                    SharedPreferences prefs = MyApplication.getContext().getSharedPreferences("data", Context.MODE_PRIVATE) ;
+                                    SharedPreferences prefs = getContext().getSharedPreferences("data", MODE_PRIVATE) ;
                                     String sno = prefs.getString("registerSno",null) ;
                                     if (sno != null){
                                         Function.sendRQcode(QRcode,sno, new Callback() {
@@ -126,32 +138,32 @@ public class SignFragment extends Fragment {
                                                 getActivity().runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        Toast.makeText(getContext(),"连接错误，请重新扫描!",Toast.LENGTH_LONG).show();
+                                                        Toast.makeText(getContext(),"连接错误，请重新扫描!",Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
                                             }
                                             @Override
                                             public void onResponse(Call call, Response response) throws IOException {
-                                               String result = response.body().string() ;
+                                               final String result = response.body().string() ;
                                                 if (result.equals("00")){
                                                     getActivity().runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
-                                                            Toast.makeText(MyApplication.getContext(),"你还未选择这门课程！",Toast.LENGTH_LONG).show();
+                                                            Toast.makeText(getContext(),"你还未选择这门课程！",Toast.LENGTH_SHORT).show();
                                                         }
                                                     });
                                                 }else if (result.equals("11")){
                                                    getActivity().runOnUiThread(new Runnable() {
                                                        @Override
                                                        public void run() {
-                                                           Toast.makeText(MyApplication.getContext(),"二维码过期，请注意扫描二维码的时间！",Toast.LENGTH_LONG).show();
+                                                           Toast.makeText(getContext(),"二维码过期，请注意扫描二维码的时间！" ,Toast.LENGTH_SHORT).show();
                                                        }
                                                    });
                                                 }else if (result.equals("22")){
                                                     getActivity().runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
-                                                            Toast.makeText(MyApplication.getContext(),"你已经完成签到或者你已经完成请假，或者未知错误导致签到失败，请向管理员反应！",Toast.LENGTH_LONG).show();
+                                                            Toast.makeText(getContext(),"你已经完成签到或者你已经完成请假！",Toast.LENGTH_SHORT).show();
                                                         }
                                                     });
                                                 }else {
@@ -171,6 +183,13 @@ public class SignFragment extends Fragment {
                                                             scanRweek.setText(intToString(QRcode.substring(6,8),"week"));
                                                             scanRday.setText(intToString(QRcode.substring(8,9),"day"));
                                                             scanRnum.setText(intToString(QRcode.substring(9,10),"num"));
+
+                                                            SharedPreferences.Editor editor = getContext().getSharedPreferences("rdata",MODE_PRIVATE).edit() ;
+                                                            editor.putString("cno",QRcode.substring(0,6)) ;
+                                                            editor.putString("week",QRcode.substring(6,8)) ;
+                                                            editor.putString("day",QRcode.substring(8,9)) ;
+                                                            editor.putString("num",QRcode.substring(9,10)) ;
+                                                            editor.apply();
                                                         }
                                                     });
                                                 }
@@ -180,7 +199,7 @@ public class SignFragment extends Fragment {
                                         getActivity().runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                Toast.makeText(MyApplication.getContext(),"未登录账号，或者缓存被清除！",Toast.LENGTH_LONG).show();
+                                                Toast.makeText(getContext(),"未登录账号，或者缓存被清除！",Toast.LENGTH_LONG).show();
                                             }
                                         });
                                     }

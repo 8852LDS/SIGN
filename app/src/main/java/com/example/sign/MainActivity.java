@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             registerPwd.setText("");
-                            Toast.makeText(MyApplication.getContext(),"账号或密码错误，请重新登陆！",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"账号或密码错误，请重新登陆！",Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
                         }
                     });
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             registerPwd.setText("");
-                            Toast.makeText(MyApplication.getContext(),"出现未知错误，请重新登陆！",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"出现未知错误，请重新登陆！",Toast.LENGTH_SHORT).show();
                             Log.d("Main",result) ;
                             progressDialog.dismiss();
                         }

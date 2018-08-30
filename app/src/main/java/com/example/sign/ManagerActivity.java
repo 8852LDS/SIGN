@@ -21,12 +21,6 @@ import com.example.sign.fragment.LeaveFragment;
 import com.example.sign.fragment.MyselfFragment;
 import com.example.sign.fragment.RecordFragment;
 import com.example.sign.fragment.SignFragment;
-import com.uuzuche.lib_zxing.activity.CaptureActivity;
-import com.uuzuche.lib_zxing.activity.CodeUtils;
-
-import static com.example.sign.R.color.colorWither;
-import static com.example.sign.R.color.design_fab_shadow_end_color;
-import static com.example.sign.R.color.switch_thumb_disabled_material_dark;
 
 public class ManagerActivity extends AppCompatActivity implements View.OnClickListener{
     private LinearLayout record ;
